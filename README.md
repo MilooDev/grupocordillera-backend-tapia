@@ -41,9 +41,7 @@ El ecosistema ha sido construido combinando las herramientas más robustas de la
 ## 👥 Equipo de Desarrollo (Fullstack)
 Proyecto desarrollado aplicando metodologías ágiles (Scrum) y principios de diseño arquitectónico.
 
-* **Camilo Tapia** * **Autumn Arcos**
-* **Fabian Leal**
-* **Benjamin Palomino**
+* **Camilo Tapia**
 
 ---
 *Desarrollado para la asignatura de Desarrollo Fullstack III.*
