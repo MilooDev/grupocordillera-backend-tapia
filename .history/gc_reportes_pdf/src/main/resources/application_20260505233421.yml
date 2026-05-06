@@ -1,0 +1,20 @@
+server:
+  port: 8093
+spring:
+  application:
+    name: gc-reportes-pdf
+  
+  datasource:
+    # Usaremos una BD separada llamada cordillera_reportes_db para no mezclar con las ventas en vivo
+    url: jdbc:postgresql://${DB_HOST:localhost}:5432/cordillera_reportes_db
+    username: cordillera_admin
+    password: admin123
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE:http://localhost:8761/eureka/}

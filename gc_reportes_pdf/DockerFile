@@ -1,0 +1,11 @@
+# Usamos una imagen ligera de Java 17
+FROM eclipse-temurin:17-jdk-alpine
+
+# Directorio temporal
+VOLUME /tmp
+
+# Copiamos el archivo compilado .jar desde la carpeta target
+COPY target/*.jar app.jar
+
+# Comando para ejecutar la aplicación
+ENTRYPOINT ["java","-jar","/app.jar"]

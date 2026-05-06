@@ -1,0 +1,35 @@
+services:
+  postgres-db:
+    image: postgres:15
+    container_name: cordillera-db
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: cordillera_db
+      POSTGRES_USER: cordillera_admin
+      POSTGRES_PASSWORD: admin123
+
+  eureka-server:
+    build: ./eureka_server
+    ports:
+      - "8761:8761"
+
+  gc-auth:
+    build: ./gc_auth/gc_auth
+    ports:
+      - "8081:8081"
+    depends_on:
+      - eureka-server
+      - postgres-db
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-db:5432/cordillera_db
+      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka/
+
+  api-gateway:
+    build: ./api_gateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      - eureka-server
+    environment:
+      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka/

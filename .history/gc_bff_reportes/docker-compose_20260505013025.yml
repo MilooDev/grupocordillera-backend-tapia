@@ -1,0 +1,7 @@
+redis-cache:
+    image: redis:7
+    container_name: cordillera-redis
+    ports:
+      - "6379:6379"
+
+# ... (luego sigue tu postgres-db, eureka-server, etc.)
