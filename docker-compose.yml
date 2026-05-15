@@ -70,9 +70,9 @@ services:
       - rabbitmq
       - eureka-server
 
-  gc-reportes-pdf:
+  gc_reportes_pdf:
     build: ./backend-cordillera/gc_reportes_pdf
-    container_name: gc-reportes-pdf
+    container_name: gc_reportes_pdf
     ports:
       - "8084:8084"
     environment:

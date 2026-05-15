@@ -2,7 +2,7 @@ server:
   port: 8093
 spring:
   application:
-    name: gc-reportes-pdf
+    name: gc_reportes_pdf
   
   datasource:
     # Usaremos una BD separada llamada cordillera_reportes_db para no mezclar con las ventas en vivo
