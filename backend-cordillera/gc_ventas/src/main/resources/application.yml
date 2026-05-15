@@ -4,6 +4,9 @@ server:
 spring:
   application:
     name: GC-VENTAS
+  # 👇 AQUÍ ESTÁ LA SOLUCIÓN AL CHOQUE DE TRENES DE RABBITMQ
+  main:
+    allow-bean-definition-overriding: true
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/cordillera_db}
     username: cordillera_admin

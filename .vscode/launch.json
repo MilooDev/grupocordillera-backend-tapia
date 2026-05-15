@@ -44,7 +44,8 @@
             "mainClass": "com.grupocordillera.gc_finanzas.GcFinanzasApplication",
             "projectName": "gc_finanzas",
             "args": "",
-            "envFile": "${workspaceFolder}/.env"
+            "envFile": "${workspaceFolder}/.env",
+            "vmArgs": " -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=64377 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dspring.jmx.enabled=true -Djava.rmi.server.hostname=localhost -Dspring.application.admin.enabled=true -Dspring.boot.project.name=gc_finanzas"
         },
         {
             "type": "java",
@@ -53,6 +54,38 @@
             "cwd": "${workspaceFolder}",
             "mainClass": "com.grupocordillera.gc_bff_reportes.GcBffReportesApplication",
             "projectName": "gc_bff_reportes",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env",
+            "vmArgs": " -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=61854 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dspring.jmx.enabled=true -Djava.rmi.server.hostname=localhost -Dspring.application.admin.enabled=true -Dspring.boot.project.name=gc_bff_reportes"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-GcInventarioComprasApplication<gc_inventario_compras>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.grupocordillera.gc_inventario_compras.GcInventarioComprasApplication",
+            "projectName": "gc_inventario_compras",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env",
+            "vmArgs": " -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=49254 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dspring.jmx.enabled=true -Djava.rmi.server.hostname=localhost -Dspring.application.admin.enabled=true -Dspring.boot.project.name=gc_inventario_compras"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-GcReportesPdfApplication<gc_reportes_pdf>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.grupocordillera.gc_reportes_pdf.GcReportesPdfApplication",
+            "projectName": "gc_reportes_pdf",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-GcVentasApplication<gc_ventas>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.grupocordillera.gc_ventas.GcVentasApplication",
+            "projectName": "gc_ventas",
             "args": "",
             "envFile": "${workspaceFolder}/.env"
         }

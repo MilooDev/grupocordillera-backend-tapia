@@ -66,7 +66,7 @@ public class AdminUsuarioController {
         if (token != null && token.startsWith("Bearer ")) {
             String jwt = token.substring(7);
             String rol = jwtUtil.extraerRol(jwt);
-            return RolUsuario.ROLE_ADMIN.name().equals(rol);
+            return RolUsuario.ADMIN.name().equals(rol);
         }
         return false;
     }
