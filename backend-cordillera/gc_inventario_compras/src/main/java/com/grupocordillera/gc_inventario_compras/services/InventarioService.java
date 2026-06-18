@@ -63,4 +63,6 @@ public class InventarioService {
         entidad.setPrecio(dto.getPrecio());
         entidad.setStock(dto.getStock());
     }
+
+    
 }
