@@ -1,0 +1,31 @@
+server:
+  port: 8080 # El puerto principal que usará Angular
+
+spring:
+  application:
+    name: API-GATEWAY
+  cloud:
+    gateway:
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins: "*" # Permite que el frontend se conecte
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+            allowedHeaders: "*"
+      routes:
+        # ------------------------------------
+        # RUTA 1: Módulo de Autenticación
+        # ------------------------------------
+        - id: gc-auth-route
+          uri: lb://GC-AUTH # "lb" significa Load Balancer. Busca a GC-AUTH en Eureka.
+          predicates:
+            - Path=/auth/** # Si la URL dice /auth/, mándalo para allá.
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/ # Se conecta al jefe
