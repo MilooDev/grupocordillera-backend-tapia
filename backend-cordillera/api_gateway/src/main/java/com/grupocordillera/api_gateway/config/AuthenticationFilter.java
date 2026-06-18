@@ -2,6 +2,7 @@ package com.grupocordillera.api_gateway.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
+import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -13,7 +14,7 @@ import reactor.core.publisher.Mono;
 public class AuthenticationFilter extends AbstractGatewayFilterFactory<AuthenticationFilter.Config> {
 
     @Autowired
-    private JwtUtil jwtUtil;
+    JwtUtil jwtUtil;
 
     public AuthenticationFilter() {
         super(Config.class);
@@ -65,4 +66,5 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
 
     public static class Config {
     }
+
 }
