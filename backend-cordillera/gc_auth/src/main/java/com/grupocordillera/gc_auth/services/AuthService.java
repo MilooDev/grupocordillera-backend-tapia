@@ -1,6 +1,7 @@
 package com.grupocordillera.gc_auth.services;
 
 import com.grupocordillera.gc_auth.config.JwtUtil;
+import com.grupocordillera.gc_auth.dtos.LoginRequestDTO;
 import com.grupocordillera.gc_auth.models.Usuario;
 import com.grupocordillera.gc_auth.repositories.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,5 +60,10 @@ public class AuthService {
         }
 
         return usuarioRepository.save(existente);
+    }
+
+    public Object login(LoginRequestDTO any) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'login'");
     }
 }
