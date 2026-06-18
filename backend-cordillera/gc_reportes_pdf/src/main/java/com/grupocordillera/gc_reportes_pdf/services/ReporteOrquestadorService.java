@@ -85,8 +85,7 @@ public class ReporteOrquestadorService {
         diarioRepo.deleteAll();
     }
 
-    // 3. GENERA REPORTE MENSUAL (ÚLTIMO DÍA DEL MES A LAS 23:59) - ¡Corregido el
-    // bug de febrero!
+    // 3. GENERA REPORTE MENSUAL (ÚLTIMO DÍA DEL MES A LAS 23:59)
     @Transactional
     @Scheduled(cron = "0 59 23 L * ?")
     public void generarCierreMensual() {
@@ -103,8 +102,7 @@ public class ReporteOrquestadorService {
         semanalRepo.deleteAll();
     }
 
-    // MÉTODO DE EMERGENCIA
-    @Transactional
+    // MÉTODO DE EMERGENCIA (Se elimina el @Transactional porque es solo lectura y creación de PDF)
     public void generarCierreEmergencia() {
         List<RespaldoDiario> diasSalvados = diarioRepo.findAll();
         if (diasSalvados.isEmpty())
