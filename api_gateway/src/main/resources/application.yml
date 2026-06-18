@@ -49,3 +49,15 @@ eureka:
   client:
     service-url:
       defaultZone: ${EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE:http://localhost:8761/eureka/}
+      
+springdoc:
+  swagger-ui:
+    urls:
+      - name: 01. Autenticación y Admin (gc-auth)
+        url: /api/auth/v3/api-docs
+      - name: 02. Ventas (gc-ventas)
+        url: /ventas/v3/api-docs
+      - name: 03. Inventario (gc-inventario-compras)
+        url: /api/inventario/v3/api-docs
+      - name: 04. Reportes PDF (gc_reportes_pdf)
+        url: /api/reportes/v3/api-docs

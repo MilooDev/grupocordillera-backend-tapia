@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   # --- INFRAESTRUCTURA ---
   postgres-db:
@@ -23,16 +25,22 @@ services:
     ports:
       - "6379:6379"
 
-  # --- MICROSERVICIOS CORE ---
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb-cordillera
+    ports:
+      - "27017:27017"
+
+  # --- MICROSERVICIOS CORE (JAVA / SPRING BOOT) ---
 
   eureka-server:
-    build: ./backend-cordillera/eureka_server
+    build: ./eureka_server
     container_name: eureka-server
     ports:
       - "8769:8761"
 
   gc-auth:
-    build: ./backend-cordillera/gc_auth
+    build: ./gc_auth
     container_name: gc-auth
     ports:
       - "8091:8081"
@@ -44,7 +52,7 @@ services:
       - eureka-server
 
   gc-ventas:
-    build: ./backend-cordillera/gc_ventas
+    build: ./gc_ventas
     container_name: gc-ventas
     ports:
       - "8092:8082"
@@ -58,7 +66,7 @@ services:
       - eureka-server
 
   gc-inventario-compras:
-    build: ./backend-cordillera/gc_inventario_compras
+    build: ./gc_inventario_compras
     container_name: gc-inventario-compras
     ports:
       - "8093:8083"
@@ -69,8 +77,10 @@ services:
       - postgres-db
       - eureka-server
 
+  # --- ANALÍTICA Y REPORTES (JAVA + PYTHON) ---
+
   gc_reportes_pdf:
-    build: ./backend-cordillera/gc_reportes_pdf
+    build: ./gc_reportes_pdf
     container_name: gc_reportes_pdf
     ports:
       - "8099:8084"
@@ -81,10 +91,20 @@ services:
       - postgres-db
       - eureka-server
 
+  gc_kpi_analytics:
+    build: ./gc_kpi_analytics
+    container_name: gc_kpi_analytics
+    environment:
+      - RABBITMQ_HOST=rabbitmq
+      - MONGO_URI=mongodb://mongodb:27017/kpi_db
+    depends_on:
+      - rabbitmq
+      - mongodb
+
   # --- PUERTA DE ENTRADA Y BFF ---
 
   api-gateway:
-    build: ./backend-cordillera/api_gateway
+    build: ./api_gateway
     container_name: api-gateway
     ports:
       - "8090:8080"
@@ -96,7 +116,7 @@ services:
       - eureka-server
 
   gc_bff_reportes:
-    build: ./backend-cordillera/gc_bff_reportes
+    build: ./gc_bff_reportes
     container_name: gc_bff_reportes
     ports:
       - "8095:8095"
@@ -107,6 +127,7 @@ services:
       - postgres-db
       - eureka-server
 
+  # --- HERRAMIENTAS DE DESARROLLO ---
   sonarqube:
     image: sonarqube:lts-community
     container_name: sonarqube-cordillera
