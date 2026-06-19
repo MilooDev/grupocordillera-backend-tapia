@@ -2,7 +2,6 @@ package com.grupocordillera.api_gateway.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
-import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -26,8 +25,11 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
 
             String path = exchange.getRequest().getURI().getPath();
 
-            // 1. Dejar pasar peticiones al endpoint de Login (no necesitan token)
-            if (path.contains("/api/auth/login")) {
+            // 1. EL PASE VIP: Dejar pasar Swagger y peticiones de Login (no necesitan token)
+            if (path.contains("/api/auth/login") || 
+                path.contains("/v3/api-docs") || 
+                path.contains("/swagger-ui") || 
+                path.contains("/webjars/")) {
                 return chain.filter(exchange);
             }
 
@@ -50,8 +52,7 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
                         HttpStatus.UNAUTHORIZED);
             }
 
-            // 5. Inyectar el rol en los headers internos para que los demás microservicios
-            // lo puedan leer
+            // 5. Inyectar el rol en los headers internos para que los demás microservicios lo puedan leer
             String rol = jwtUtil.extraerRol(authHeader);
             exchange.getRequest().mutate().header("X-Rol-Usuario", rol).build();
 

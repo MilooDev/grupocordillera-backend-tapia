@@ -3,16 +3,26 @@ package com.grupocordillera.api_gateway.config;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
+import jakarta.annotation.PostConstruct;
 
 @Component
 public class JwtUtil {
 
-    // La misma llave secreta que usamos en gc_auth
-    private final String SECRET_KEY = "GrupoCordilleraSecretKeyParaFirmaDeTokensSeguros2026";
-    private final SecretKey key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
+    // Extraemos la llave de las variables de entorno de Docker (con fallback local)
+    @Value("${JWT_SECRET_KEY:GrupoCordilleraSecretKeyParaFirmaDeTokensSeguros2026}")
+    private String secretKey;
+    
+    private SecretKey key;
+
+    @PostConstruct
+    public void init() {
+        // Inicializamos la llave criptográfica una vez que Spring inyecta el valor
+        this.key = Keys.hmacShaKeyFor(secretKey.getBytes());
+    }
 
     public Claims extraerReclamaciones(String token) {
         return Jwts.parser()

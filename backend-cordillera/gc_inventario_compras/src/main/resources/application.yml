@@ -6,14 +6,22 @@ spring:
     name: GC-INVENTARIO-COMPRAS
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/cordillera_db}
-    username: cordillera_admin
-    password: admin123
+    username: ${DB_USERNAME:cordillera_admin}
+    password: ${DB_PASSWORD:admin123}
   jpa:
     hibernate:
       ddl-auto: update
     show-sql: true
 
 eureka:
+  instance:
+    appname: GC-INVENTARIO-COMPRAS # 👈 El antídoto: obligar a usar guiones medios
+    prefer-ip-address: true
   client:
     service-url:
       defaultZone: ${EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE:http://localhost:8761/eureka/}
+
+# 👇 LA RUTA PARA CONECTAR SWAGGER AL GATEWAY
+springdoc:
+  api-docs:
+    path: /api/inventario/v3/api-docs

@@ -5,9 +5,9 @@ spring:
   application:
     name: GC-AUTH
   datasource:
-    url: jdbc:postgresql://localhost:5432/cordillera_db
-    username: cordillera_admin
-    password: admin123
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/cordillera_db}
+    username: ${DB_USERNAME:cordillera_admin}
+    password: ${DB_PASSWORD:admin123}
   jpa:
     hibernate:
       ddl-auto: update
@@ -21,4 +21,9 @@ eureka:
     prefer-ip-address: true
   client:
     service-url:
-      defaultZone: http://localhost:8769/eureka/
+      defaultZone: ${EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE:http://localhost:8769/eureka/}
+
+# 👇 LA MAGIA PARA ALINEAR SWAGGER CON EL GATEWAY 👇
+springdoc:
+  api-docs:
+    path: /api/auth/v3/api-docs

@@ -47,10 +47,23 @@ services:
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-db:5432/cordillera_db
       - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - SEEDER_PASSWORD=CordilleraAdmin123!
     depends_on:
       - postgres-db
       - eureka-server
 
+  gc-finanzas:
+    build: ./gc_finanzas
+    container_name: gc-finanzas
+    ports:
+      - "8094:8085" # Asegúrate de que 8085 sea el puerto interno en el application.yml de gc_finanzas
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-db:5432/cordillera_db
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka-server:8761/eureka/
+    depends_on:
+      - postgres-db
+      - eureka-server
+      
   gc-ventas:
     build: ./gc_ventas
     container_name: gc-ventas
