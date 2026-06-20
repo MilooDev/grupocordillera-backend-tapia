@@ -1,170 +1,198 @@
-🏔️ Grupo Cordillera - Plataforma Analítica Estratégica
+# 🏔️ Grupo Cordillera - Plataforma Analítica Estratégica
 
-📌 Descripción del Proyecto
-Este repositorio contiene el código fuente y el diseño arquitectónico de la solución tecnológica desarrollada para Grupo Cordillera, una organización del sector retail.
+## 📌 Descripción General
 
-El propósito principal de este proyecto es modernizar una infraestructura tecnológica históricamente fragmentada, eliminando la dependencia de procesos manuales (como la consolidación en hojas de cálculo) para resolver cuellos de botella operativos. A través de buenas prácticas de ingeniería de software, buscamos habilitar la toma de decisiones estratégicas basadas en datos en tiempo real.
+**Grupo Cordillera** es una plataforma empresarial desarrollada para modernizar y optimizar los procesos operativos de una organización del sector retail mediante una arquitectura basada en microservicios.
 
-🚀 La Solución
-Para cumplir con los objetivos del negocio, se ha diseñado una Arquitectura de Microservicios políglota y resiliente. El sistema automatiza el flujo de información entre ventas, inventario y finanzas, integrando un motor analítico avanzado para el cálculo de KPIs.
+Su objetivo principal es eliminar la dependencia de procesos manuales, automatizar el flujo de información entre ventas, inventario y finanzas, y proporcionar indicadores estratégicos en tiempo real para apoyar la toma de decisiones.
 
-Características Principales:
-Desacoplamiento Operativo: Uso de comunicación asíncrona impulsada por eventos para garantizar que el sistema de cajas/ventas nunca se bloquee.
+---
 
-Tolerancia a Fallos: Implementación de patrones de resiliencia como Circuit Breaker para aislar errores y mantener la disponibilidad.
+## 🚀 Objetivos
 
-Escalabilidad Dinámica: Infraestructura totalmente contenerizada y orquestada para soportar picos de alta demanda transaccional de forma automática.
+- Automatizar procesos críticos del negocio.
+- Centralizar la gestión de ventas, inventario y finanzas.
+- Reducir errores operativos derivados de procesos manuales.
+- Proporcionar KPIs e indicadores en tiempo real.
+- Garantizar escalabilidad, disponibilidad y resiliencia.
 
-Seguridad y Transparencia: Control de accesos centralizado mediante tokens JWT y generación de reportes mensuales inmutables para auditoría.
+---
 
-🛠️ Stack Tecnológico
-El ecosistema ha sido construido combinando las herramientas más robustas de la industria actual:
+## 🏗️ Arquitectura de la Solución
 
-Backend & Ecosistema de Microservicios:
+La plataforma implementa una **Arquitectura de Microservicios Políglota**, diseñada para ofrecer desacoplamiento, resiliencia y escalabilidad.
 
-Java 17/21 & Spring Boot 3.2.x (Microservicios Transaccionales: Auth, Ventas, Inventario, Finanzas, BFF, PDF)
+### 🔄 Comunicación basada en eventos
 
-Python 3.9 (Motor de analítica matemática y KPIs)
+Utilización de RabbitMQ para garantizar la comunicación asíncrona entre servicios y evitar bloqueos en procesos críticos.
 
-Spring Cloud (API Gateway, Eureka Server, Config Server)
+### 🛡️ Resiliencia y Alta Disponibilidad
 
-Frontend:
+Implementación de patrones como **Circuit Breaker**, permitiendo aislar fallos y mantener la continuidad operativa.
 
-React (Single Page Application para visualización de Dashboards Gerenciales)
+### 📈 Escalabilidad Horizontal
 
-Comunicación & Mensajería:
+Infraestructura contenerizada preparada para Kubernetes y autoescalado dinámico.
 
-RabbitMQ (Message Broker / Arquitectura Pub-Sub)
+### 🔐 Seguridad Centralizada
 
-OpenFeign / WebClient (Comunicación síncrona REST)
+Autenticación y autorización mediante JWT gestionadas desde API Gateway.
 
-Bases de Datos (Políglota):
+### 📊 Analítica Empresarial
 
-PostgreSQL (Persistencia relacional centralizada cordillera_db)
+Motor especializado para el cálculo de KPIs y generación de métricas estratégicas.
 
-MongoDB (Persistencia documental para analítica)
+---
 
-Redis (Caché en memoria)
+## 🛠️ Stack Tecnológico
 
-Infraestructura & Despliegue:
+### Backend
 
-Docker & Docker Compose (Contenerización y Multi-stage builds)
+- Java 17 / 21
+- Spring Boot 3.2.x
+- Spring Cloud
+- Spring Security
+- OpenFeign
+- WebClient
 
-Kubernetes (Orquestación, gestión de red interna y auto-escalado horizontal HPA)
+### Analítica
 
-🧩 Ecosistema de Microservicios (Backend)
-El backend está dividido en dominios de negocio aislados para garantizar la alta disponibilidad:
+- Python 3.9+
 
-eureka_server: Servidor de descubrimiento. Directorio central donde todos los nodos registran su estado e IP.
+### Frontend
 
-api_gateway: Puerta de enlace única y proxy inverso. Centraliza CORS (habilitado para React), Swagger UI y gestiona el AuthenticationFilter para validar firmas criptográficas JWT.
+- React
 
-gc_auth: Proveedor de identidades. Gestiona el registro administrativo y la emisión de tokens.
+### Mensajería
 
-gc_ventas: Motor transaccional. Registra ventas y emite eventos hacia RabbitMQ para notificar a otras áreas.
+- RabbitMQ
 
-gc_inventario_compras: Sistema de gestión de stock. Escucha los eventos de ventas para descontar existencias en tiempo real.
+### Bases de Datos
 
-gc_finanzas: Módulo contable. Gestiona la caja y validaciones de transacciones.
+- PostgreSQL
+- MongoDB
+- Redis
 
-gc_kpi_analytics (Python): Motor de analítica de datos para la toma de decisiones comerciales.
+### Infraestructura
 
-gc_bff_reportes (Backend-For-Frontend): Capa de adaptación que optimiza y formatea los datos masivos específicamente para el consumo del cliente web React.
+- Docker
+- Docker Compose
+- Kubernetes
 
-gc_reportes_pdf: Generador de documentos pesados. Automatiza el ciclo de facturación mensual.
+---
 
-📂 Estructura Estricta de Directorios y Paquetes
-El repositorio mantiene una separación estricta entre configuraciones de entorno y el código fuente. Cada microservicio de Java respeta una topología de paquetes detallada (Ejemplo referencial de gc_ventas):
+## 🧩 Ecosistema de Microservicios
 
-Plaintext
-📦 GRUPO-CORDILLERA-BACKEND
- ┣ 📂 .github                      # Pipelines de CI/CD
- ┗ 📂 backend-cordillera           # Raíz del ecosistema backend
-   ┣ 📂 api_gateway
-   ┣ 📂 eureka_server
-   ┣ 📂 gc_auth
-   ┣ 📂 gc_bff_reportes
-   ┣ 📂 gc_finanzas
-   ┣ 📂 gc_inventario_compras
-   ┣ 📂 gc_kpi_analytics           # Entorno Python
-   ┣ 📂 gc_reportes_pdf
-   ┣ 📂 gc_ventas
-   ┃ ┣ 📂 src/main/java/com/grupocordillera/ventas
-   ┃ ┃ ┣ 📂 config                 # Configuraciones (RabbitMQ, Swagger)
-   ┃ ┃ ┣ 📂 controller             # Endpoints REST protegidos
-   ┃ ┃ ┣ 📂 dto                    # Objetos de entrada/salida blindados con @Valid
-   ┃ ┃ ┣ 📂 entity                 # Entidades JPA (Venta, DetalleVenta)
-   ┃ ┃ ┣ 📂 exception              # Manejo de errores global
-   ┃ ┃ ┣ 📂 messaging              # Productores/Consumidores RabbitMQ
-   ┃ ┃ ┣ 📂 repository             # Interfaces de Spring Data PostgreSQL
-   ┃ ┃ ┣ 📂 security               # Filtros internos y utilidades JWT
-   ┃ ┃ ┗ 📂 service                # Lógica de negocio core (Interfaces e impl)
-   ┃ ┣ 📂 src/main/resources
-   ┃ ┃ ┣ 📜 application.yml        # Variables de entorno y perfil local
-   ┃ ┃ ┗ 📜 application-docker.yml # Perfil exclusivo para contenedores
-   ┃ ┗ 📜 pom.xml
-   ┗ 📜 docker-compose.yml         # Orquestación global de la arquitectura
-🚀 Guía de Ejecución Local
-Prerrequisitos
-Docker y Docker Compose instalados.
+| Servicio | Responsabilidad |
+|-----------|----------------|
+| `eureka_server` | Descubrimiento de servicios |
+| `api_gateway` | Gateway, seguridad y enrutamiento |
+| `gc_auth` | Autenticación y autorización |
+| `gc_ventas` | Gestión de ventas |
+| `gc_inventario_compras` | Control de inventario |
+| `gc_finanzas` | Gestión financiera |
+| `gc_kpi_analytics` | Cálculo de KPIs |
+| `gc_bff_reportes` | Backend for Frontend |
+| `gc_reportes_pdf` | Generación de reportes PDF |
 
-Java JDK y Maven instalados.
+---
 
-Python 3.9+ (para el módulo de analítica).
+## 📂 Estructura del Proyecto
 
-Paso 1: Levantar la Infraestructura Base
-Posiciónate en la carpeta de microservicios y levanta primero las bases de datos y la mensajería:
+```text
+GRUPO-CORDILLERA-BACKEND
+│
+├── .github
+├── backend-cordillera
+│   ├── api_gateway
+│   ├── eureka_server
+│   ├── gc_auth
+│   ├── gc_bff_reportes
+│   ├── gc_finanzas
+│   ├── gc_inventario_compras
+│   ├── gc_kpi_analytics
+│   ├── gc_reportes_pdf
+│   ├── gc_ventas
+│   └── docker-compose.yml
+```
 
-Bash
+---
+
+## 🚀 Ejecución Local
+
+### Prerrequisitos
+
+- Java JDK 17+
+- Maven
+- Docker
+- Docker Compose
+- Python 3.9+
+
+### Levantar Infraestructura Base
+
+```bash
 cd backend-cordillera
+
 docker-compose up -d postgres rabbitmq mongo redis
-Paso 2: Orden de Inicialización
-Debido a las dependencias de red, los servicios deben arrancarse en el siguiente orden:
+```
 
-eureka_server: Esperar a que el puerto 8761 esté activo.
+### Despliegue Completo
 
-Módulos de Negocio: Iniciar los microservicios core (gc_auth, gc_ventas, etc.) usando ./mvnw spring-boot:run.
-
-api_gateway: Iniciar al final para asegurar el mapeo de los servicios ya registrados en Eureka.
-
-Alternativa: Full Docker
-Para levantar toda la arquitectura contenerizada y enlazada automáticamente:
-
-Bash
+```bash
 cd backend-cordillera
+
 docker-compose up -d --build
-🧪 Testing, Cobertura y Calidad de Código
-El proyecto exige un alto estándar de calidad. Cada microservicio cuenta con un set de pruebas riguroso (JUnit, Mockito, MockMvc) aislando capas.
+```
 
-Ejecutar Pruebas y Reporte JaCoCo:
+---
 
-Bash
+## 🧪 Testing y Calidad
+
+### Ejecutar Pruebas
+
+```bash
 cd backend-cordillera/gc_ventas
+
 ./mvnw clean test
-(El reporte HTML de cobertura se generará en target/site/jacoco/index.html excluyendo entidades y DTOs).
+```
 
-Análisis Estático con SonarQube:
+### SonarQube
 
-Bash
-./mvnw sonar:sonar -Dsonar.projectKey=grupo-cordillera-backend -Dsonar.host.url=http://localhost:9000 -Dsonar.login=tu_token
-📖 Endpoints y Documentación (Swagger)
-La documentación de la API está unificada a través del API Gateway mediante Springdoc OpenAPI. Una vez iniciados los servicios, accede al panel central interactivo:
+```bash
+./mvnw sonar:sonar \
+-Dsonar.projectKey=grupo-cordillera-backend \
+-Dsonar.host.url=http://localhost:9000 \
+-Dsonar.login=TU_TOKEN
+```
 
-👉 http://localhost:8080/webjars/swagger-ui/index.html
+---
 
-Módulos disponibles en el menú desplegable:
+## 📖 Documentación API
 
-🔐 Módulo de Autenticación (/api/auth/)
+Swagger UI disponible en:
 
-🛒 Módulo de Ventas (/ventas/)
+```text
+http://localhost:8080/webjars/swagger-ui/index.html
+```
 
-📦 Módulo de Inventario (/api/inventario/)
+### Módulos Disponibles
 
-(Nota: Para consumir las rutas protegidas, genera un token en /api/auth/login y autoriza la sesión en el botón "Authorize" de la UI).
+- 🔐 Autenticación
+- 🛒 Ventas
+- 📦 Inventario
+- 💰 Finanzas
+- 📊 Reportes
 
-👥 Equipo de Desarrollo (Fullstack)
-Proyecto desarrollado aplicando metodologías ágiles (Scrum) y principios avanzados de diseño arquitectónico.
+---
 
-Camilo Tapia
+## 👥 Equipo de Desarrollo
 
-Desarrollado para la asignatura de Desarrollo Fullstack III.
+Desarrollado bajo metodologías ágiles (**Scrum**) y principios de arquitectura empresarial moderna.
+
+- Camilo Tapia
+
+---
+
+## 🎓 Contexto Académico
+
+Proyecto desarrollado para la asignatura **Desarrollo Fullstack III**.
