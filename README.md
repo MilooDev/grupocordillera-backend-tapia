@@ -61,7 +61,7 @@ Motor especializado para el cálculo de KPIs y generación de métricas estraté
 
 ### Frontend
 
-- React
+- Angular
 
 ### Mensajería
 
