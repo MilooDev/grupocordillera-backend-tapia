@@ -1,4 +1,5 @@
 🏔️ Grupo Cordillera - Plataforma Analítica Estratégica
+
 📌 Descripción del Proyecto
 Este repositorio contiene el código fuente y el diseño arquitectónico de la solución tecnológica desarrollada para Grupo Cordillera, una organización del sector retail.
 
