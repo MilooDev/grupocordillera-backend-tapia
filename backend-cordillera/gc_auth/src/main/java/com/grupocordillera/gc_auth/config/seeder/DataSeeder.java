@@ -1,4 +1,4 @@
-package com.grupocordillera.gc_auth; 
+package com.grupocordillera.gc_auth.config.seeder; 
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
@@ -54,7 +54,9 @@ public class DataSeeder {
                 bodeguero.setRol(RolUsuario.BODEGUERO); 
                 usuarioRepository.save(bodeguero);
 
-                System.out.println("✅ Usuarios de prueba creados exitosamente usando variables de entorno.");
+                System.out.println("✅ [SEEDER] Usuarios de prueba creados exitosamente usando variables de entorno.");
+            } else {
+                System.out.println("⚡ [SEEDER] La base de datos ya contiene usuarios. Se omite la inyección automática.");
             }
         };
     }
