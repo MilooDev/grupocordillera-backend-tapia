@@ -10,11 +10,13 @@ spring:
       # CONFIGURACIÓN GLOBAL DE CORS PARA EL FRONTEND
       # =========================================================
       globalcors:
+        add-to-simple-url-handler-mapping: true
         cors-configurations:
           '[/**]':
             allowedOrigins:
-              - "http://localhost:5173"  # Puerto estándar de Vite / React moderno
-              - "http://localhost:3000"  # Puerto estándar de React clásico o Next.js
+              - "http://localhost:5173"
+              - "http://localhost:3000"
+              - "http://localhost:4200"
             allowedMethods:
               - GET
               - POST
@@ -52,13 +54,11 @@ spring:
         # =========================================================
         # RUTAS DE NEGOCIO CORE
         # =========================================================
-        # 1. RUTA PARA AUTENTICACIÓN (Login público, no usa el filtro)
         - id: auth-service
           uri: lb://GC-AUTH
           predicates:
             - Path=/api/auth/**
 
-        # 2. RUTA PARA USUARIOS ADMIN (Protegida)
         - id: auth-admin-service
           uri: lb://GC-AUTH
           predicates:
@@ -66,7 +66,6 @@ spring:
           filters:
             - AuthenticationFilter
 
-        # 3. RUTA PARA VENTAS (Protegida)
         - id: ventas-service
           uri: lb://GC-VENTAS
           predicates:
@@ -74,7 +73,6 @@ spring:
           filters:
             - AuthenticationFilter
 
-        # 4. RUTA PARA INVENTARIO/PRODUCTOS (Protegida)
         - id: inventario-service
           uri: lb://GC-INVENTARIO-COMPRAS
           predicates:
@@ -82,7 +80,6 @@ spring:
           filters:
             - AuthenticationFilter
 
-        # 5. RUTA PARA REPORTES PDF (Protegida)
         - id: reportes-service
           uri: lb://GC-REPORTES-PDF
           predicates:

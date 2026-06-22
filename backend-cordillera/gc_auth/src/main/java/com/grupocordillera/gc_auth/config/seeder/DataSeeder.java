@@ -14,7 +14,7 @@ import com.grupocordillera.gc_auth.repositories.UsuarioRepository;
 public class DataSeeder {
 
     // Extraemos la contraseña desde el entorno (o usamos un fallback seguro si no existe)
-    @Value("${SEEDER_PASSWORD:CordilleraSegura2026!}")
+    @Value("${SEEDER_PASSWORD:admin123}")
     private String seederPassword;
 
     @Bean

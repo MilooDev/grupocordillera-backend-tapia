@@ -47,7 +47,7 @@ services:
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-db:5432/cordillera_db
       - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka-server:8761/eureka/
-      - SEEDER_PASSWORD=CordilleraAdmin123!
+      - SEEDER_PASSWORD=admin123
     depends_on:
       - postgres-db
       - eureka-server
