@@ -17,6 +17,12 @@ public class InventarioController {
     @Autowired
     private InventarioService inventarioService;
 
+    // --- NUEVO ENDPOINT PARA LA CAJA (Descarga el catálogo inicial) ---
+    @GetMapping("/productos")
+    public ResponseEntity<Object> listarTodos() {
+        return ResponseEntity.ok(inventarioService.listarTodosLosProductos());
+    }
+
     // --- PARA EL VENDEDOR (Buscador rápido) ---
     @GetMapping("/buscar")
     public ResponseEntity<List<Producto>> buscarRapido(@RequestParam String termino) {

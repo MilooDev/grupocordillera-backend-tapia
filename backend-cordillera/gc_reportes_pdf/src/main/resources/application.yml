@@ -1,14 +1,14 @@
 server:
-  port: 8099  # <-- Lo unificamos a 8099 para evitar chocar con zombies
+  port: 8099
 
 spring:
   application:
-    name: gc_reportes_pdf
-  
+    name: gc-reportes-pdf
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/cordillera_db}
     username: cordillera_admin
     password: admin123
+    driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
       ddl-auto: update
@@ -18,3 +18,5 @@ eureka:
   client:
     service-url:
       defaultZone: ${EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE:http://localhost:8761/eureka/}
+  instance:
+    prefer-ip-address: true

@@ -1,11 +1,10 @@
 package com.grupocordillera.gc_reportes_pdf.services;
 
 import com.grupocordillera.gc_reportes_pdf.clients.VentasClient;
+import com.grupocordillera.gc_reportes_pdf.dtos.CierreDiarioDTO;
 import com.grupocordillera.gc_reportes_pdf.dtos.VentaUbicacionDTO;
 import com.grupocordillera.gc_reportes_pdf.models.RespaldoDiario;
-import com.grupocordillera.gc_reportes_pdf.models.RespaldoSemanal;
 import com.grupocordillera.gc_reportes_pdf.repositories.RespaldoDiarioRepository;
-import com.grupocordillera.gc_reportes_pdf.repositories.RespaldoSemanalRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,10 +12,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.io.File;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -27,121 +27,99 @@ class ReporteOrquestadorServiceTest {
     private VentasClient ventasClient;
 
     @Mock
-    private RespaldoDiarioRepository diarioRepo;
-
-    @Mock
-    private RespaldoSemanalRepository semanalRepo;
+    private RespaldoDiarioRepository respaldoDiarioRepository;
 
     @InjectMocks
     private ReporteOrquestadorService orquestadorService;
 
-    private List<VentaUbicacionDTO> listaUbicacionesMock;
-    private List<RespaldoDiario> listaDiariaMock;
-    private List<RespaldoSemanal> listaSemanalMock;
+    private CierreDiarioDTO cierreDiarioMock;
+    private LocalDate fechaPrueba;
 
     @BeforeEach
     void setUp() {
-        // En lugar de instanciarlo y usar setters, mockeamos el DTO para evitar errores de compilación
-        VentaUbicacionDTO dto = mock(VentaUbicacionDTO.class);
-        
-        // Usamos lenient() por si algún test no ocupa todos los campos
-        lenient().when(dto.getRegion()).thenReturn("Metropolitana");
-        lenient().when(dto.getComuna()).thenReturn("Santiago");
-        lenient().when(dto.getTotalRecaudado()).thenReturn(50000.0);
-        lenient().when(dto.getProductoId()).thenReturn(1L);
-        lenient().when(dto.getCantidadVentas()).thenReturn(5L); // Ajusta a 5 si tu DTO retorna Integer en lugar de Long
+        fechaPrueba = LocalDate.now();
 
-        listaUbicacionesMock = new ArrayList<>();
-        listaUbicacionesMock.add(dto);
+        // Creamos la lista de desgloses geográficos reales para el DTO
+        VentaUbicacionDTO ubicacion1 = new VentaUbicacionDTO();
+        ubicacion1.setRegion("Metropolitana");
+        ubicacion1.setComuna("Pedro Aguirre Cerda");
+        ubicacion1.setCantidadVentas(15L);
+        ubicacion1.setTotalRecaudado(45000.0);
 
-        RespaldoDiario diario = new RespaldoDiario();
-        diario.setTotalRecaudado(10000.0);
-        diario.setCantidadVentas(2);
-        listaDiariaMock = new ArrayList<>();
-        listaDiariaMock.add(diario);
+        VentaUbicacionDTO ubicacion2 = new VentaUbicacionDTO();
+        ubicacion2.setRegion("Metropolitana");
+        ubicacion2.setComuna("Santiago Centro");
+        ubicacion2.setCantidadVentas(25L);
+        ubicacion2.setTotalRecaudado(75000.0);
 
-        RespaldoSemanal semanal = new RespaldoSemanal();
-        semanal.setTotalRecaudado(50000.0);
-        semanal.setCantidadVentas(10);
-        listaSemanalMock = new ArrayList<>();
-        listaSemanalMock.add(semanal);
+        List<VentaUbicacionDTO> ubicaciones = new ArrayList<>();
+        ubicaciones.add(ubicacion1);
+        ubicaciones.add(ubicacion2);
+
+        // Instanciamos el DTO principal con los datos unificados
+        cierreDiarioMock = new CierreDiarioDTO();
+        cierreDiarioMock.setFecha(fechaPrueba);
+        cierreDiarioMock.setCantidadVentas(40);
+        cierreDiarioMock.setTotalRecaudado(120000.0);
+        cierreDiarioMock.setVentasPorUbicacion(ubicaciones);
+    }
+
+    // ==========================================
+    // PRUEBAS PARA: guardarEstadisticaDiaria
+    // ==========================================
+
+    @Test
+    void cuandoGuardarEstadisticaDiariaEsExitoso_entoncesGuardaUnRegistroPorCadaUbicacion() {
+        // Mapeamos el comportamiento del cliente Feign pasando la fecha como String
+        when(ventasClient.obtenerDatosCierreDiario(fechaPrueba.toString())).thenReturn(cierreDiarioMock);
+        when(respaldoDiarioRepository.save(any(RespaldoDiario.class))).thenReturn(new RespaldoDiario());
+
+        assertDoesNotThrow(() -> orquestadorService.guardarEstadisticaDiaria(fechaPrueba));
+
+        // Verificamos que se ejecute el save() 2 veces (una por cada ubicación del desglose)
+        verify(respaldoDiarioRepository, times(2)).save(any(RespaldoDiario.class));
     }
 
     @Test
-    void cuandoRecolectarCierreDiarioEsExitoso_entoncesGuardaRespaldo() {
-        when(ventasClient.obtenerCierreDelDia()).thenReturn(listaUbicacionesMock);
+    void cuandoVentasClientDevuelveNull_entoncesLanzaRuntimeException() {
+        when(ventasClient.obtenerDatosCierreDiario(fechaPrueba.toString())).thenReturn(null);
 
-        orquestadorService.recolectarCierreDiario();
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+            orquestadorService.guardarEstadisticaDiaria(fechaPrueba);
+        });
 
-        // Ahora sí, verificará que el save() se ejecute exitosamente
-        verify(diarioRepo, times(1)).save(any(RespaldoDiario.class));
+        assertTrue(exception.getMessage().contains("No hay datos de ventas"));
+        verify(respaldoDiarioRepository, never()).save(any());
+    }
+
+    // ==========================================
+    // PRUEBAS PARA: generarPdfDiario (Al Vuelo)
+    // ==========================================
+
+    @Test
+    void cuandoGenerarPdfDiarioEsExitoso_entoncesRetornaArregloDeBytesValido() {
+        when(ventasClient.obtenerDatosCierreDiario(fechaPrueba.toString())).thenReturn(cierreDiarioMock);
+
+        byte[] pdfResultado = orquestadorService.generarPdfDiario(fechaPrueba);
+
+        assertNotNull(pdfResultado);
+        assertTrue(pdfResultado.length > 0, "El PDF no debería estar vacío");
+        
+        // Verificamos que el PDF mantenga la firma estándar de archivos %PDF (los primeros 4 bytes)
+        assertEquals(0x25, pdfResultado[0]); // '%'
+        assertEquals(0x50, pdfResultado[1]); // 'P'
+        assertEquals(0x44, pdfResultado[2]); // 'D'
+        assertEquals(0x46, pdfResultado[3]); // 'F'
     }
 
     @Test
-    void cuandoRecolectarCierreDiarioFalla_entoncesLlamaEmergencia() {
-        when(ventasClient.obtenerCierreDelDia()).thenThrow(new RuntimeException("Error simulado"));
-        when(diarioRepo.findAll()).thenReturn(listaDiariaMock); // Para que la emergencia haga algo
+    void cuandoGenerarPdfDiarioFallaPorClientNull_entoncesLanzaException() {
+        when(ventasClient.obtenerDatosCierreDiario(fechaPrueba.toString())).thenReturn(null);
 
-        orquestadorService.recolectarCierreDiario();
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+            orquestadorService.generarPdfDiario(fechaPrueba);
+        });
 
-        // Limpiamos la basura generada
-        borrarPdfsGeneradosPorTest();
-        
-        // Comprobamos que el protocolo de emergencia operó (leyendo de BD)
-        verify(diarioRepo, times(1)).findAll();
-    }
-
-    @Test
-    void cuandoGenerarCierreSemanalConDatos_entoncesGeneraYBorra() {
-        when(diarioRepo.findAll()).thenReturn(listaDiariaMock);
-
-        orquestadorService.generarCierreSemanal();
-
-        borrarPdfsGeneradosPorTest();
-
-        verify(semanalRepo, times(1)).save(any(RespaldoSemanal.class));
-        verify(diarioRepo, times(1)).deleteAll();
-    }
-
-    @Test
-    void cuandoGenerarCierreSemanalSinDatos_entoncesNoHaceNada() {
-        when(diarioRepo.findAll()).thenReturn(new ArrayList<>());
-        
-        orquestadorService.generarCierreSemanal();
-        
-        verify(semanalRepo, never()).save(any());
-    }
-
-    @Test
-    void cuandoGenerarCierreMensualConDatos_entoncesGeneraYBorra() {
-        when(semanalRepo.findAll()).thenReturn(listaSemanalMock);
-
-        orquestadorService.generarCierreMensual();
-
-        borrarPdfsGeneradosPorTest();
-
-        verify(semanalRepo, times(1)).deleteAll();
-    }
-
-    @Test
-    void cuandoGenerarCierreMensualSinDatos_entoncesNoHaceNada() {
-        when(semanalRepo.findAll()).thenReturn(new ArrayList<>());
-        
-        orquestadorService.generarCierreMensual();
-        
-        verify(semanalRepo, never()).deleteAll();
-    }
-
-    // Método utilitario para limpiar la carpeta raíz de PDFs basura
-    private void borrarPdfsGeneradosPorTest() {
-        File folder = new File(".");
-        File[] listOfFiles = folder.listFiles();
-        if (listOfFiles != null) {
-            for (File file : listOfFiles) {
-                if (file.isFile() && file.getName().endsWith(".pdf")) {
-                    file.delete();
-                }
-            }
-        }
+        assertTrue(exception.getMessage().contains("Sin datos para generar PDF"));
     }
 }

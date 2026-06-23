@@ -6,7 +6,9 @@ public class VentaUbicacionDTO {
     private Double totalRecaudado;
     private Long cantidadVentas;
 
-    // Getters y Setters
+    public VentaUbicacionDTO() {
+    }
+
     public String getRegion() {
         return region;
     }
@@ -37,10 +39,5 @@ public class VentaUbicacionDTO {
 
     public void setCantidadVentas(Long cantidadVentas) {
         this.cantidadVentas = cantidadVentas;
-    }
-
-    public Long getProductoId() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getProductoId'");
     }
 }

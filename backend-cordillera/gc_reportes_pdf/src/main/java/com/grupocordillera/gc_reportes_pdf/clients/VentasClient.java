@@ -1,12 +1,13 @@
 package com.grupocordillera.gc_reportes_pdf.clients;
 
-import com.grupocordillera.gc_reportes_pdf.dtos.VentaUbicacionDTO;
+import com.grupocordillera.gc_reportes_pdf.dtos.CierreDiarioDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
-import java.util.List;
+import org.springframework.web.bind.annotation.RequestParam;
 
-@FeignClient(name = "GC-VENTAS")
+@FeignClient(name = "gc-ventas")
 public interface VentasClient {
-    @GetMapping("/ventas/cierre-diario")
-    List<VentaUbicacionDTO> obtenerCierreDelDia();
+
+    @GetMapping("/api/ventas/interno/cierre-diario")
+    CierreDiarioDTO obtenerDatosCierreDiario(@RequestParam("fecha") String fecha);
 }

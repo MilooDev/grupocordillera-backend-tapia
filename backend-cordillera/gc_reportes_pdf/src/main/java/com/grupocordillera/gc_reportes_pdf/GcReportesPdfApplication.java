@@ -8,10 +8,11 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
 @EnableDiscoveryClient
-@EnableFeignClients
-@EnableScheduling
+@EnableFeignClients   // Habilita la comunicación con gc_ventas
+@EnableScheduling     // Habilita la generación automática a fin de mes
 public class GcReportesPdfApplication {
-	public static void main(String[] args) {
-		SpringApplication.run(GcReportesPdfApplication.class, args);
-	}
+
+    public static void main(String[] args) {
+        SpringApplication.run(GcReportesPdfApplication.class, args);
+    }
 }

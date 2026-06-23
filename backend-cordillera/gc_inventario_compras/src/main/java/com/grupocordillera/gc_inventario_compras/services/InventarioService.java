@@ -18,6 +18,12 @@ public class InventarioService {
     // ==========================================
     // 1. FUNCIONES PÚBLICAS (Frontend y Vendedores)
     // ==========================================
+    
+    // 🚀 MÉTODO CORREGIDO: Ahora sí devuelve la lista real de la base de datos
+    public List<Producto> listarTodosLosProductos() {
+        return productoRepository.findAll();
+    }
+
     public List<Producto> buscarRapido(String termino) {
         return productoRepository.findByNombreContainingIgnoreCase(termino);
     }
@@ -63,6 +69,4 @@ public class InventarioService {
         entidad.setPrecio(dto.getPrecio());
         entidad.setStock(dto.getStock());
     }
-
-    
 }
