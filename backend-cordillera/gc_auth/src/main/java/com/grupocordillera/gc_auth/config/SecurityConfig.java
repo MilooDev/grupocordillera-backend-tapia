@@ -30,6 +30,9 @@ public class SecurityConfig {
             // 3. CONFIGURAR RUTAS (Permitimos login, protegemos el resto)
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/auth/**").permitAll()
+                // 🚀 LA PIEZA FALTANTE: Abrimos la puerta para que la petición llegue al controlador
+                // (La validación de seguridad de los gerentes/admins ya la hace el AdminUsuarioController)
+                .requestMatchers("/api/admin/usuarios/**").permitAll()
                 .anyRequest().authenticated()
             )
             
