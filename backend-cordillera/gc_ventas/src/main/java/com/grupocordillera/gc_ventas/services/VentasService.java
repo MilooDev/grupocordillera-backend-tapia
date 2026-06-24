@@ -2,6 +2,7 @@ package com.grupocordillera.gc_ventas.services;
 
 import com.grupocordillera.gc_ventas.clients.InventarioClient;
 import com.grupocordillera.gc_ventas.config.RabbitMQConfig;
+import com.grupocordillera.gc_ventas.dtos.CierreDiarioDTO;
 import com.grupocordillera.gc_ventas.dtos.DetalleVentaDTO;
 import com.grupocordillera.gc_ventas.dtos.VentaRequestDTO;
 import com.grupocordillera.gc_ventas.dtos.VentaResponseDTO;
@@ -20,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class VentaService {
+public class VentasService { // <-- Corregido a plural según tu imagen
 
     @Autowired
     private VentaRepository ventaRepository;
@@ -35,8 +36,6 @@ public class VentaService {
         try {
             Venta nuevaVenta = new Venta();
             nuevaVenta.setClienteRut(requestDTO.getClienteRut());
-
-            // Guardamos los nuevos datos geográficos
             nuevaVenta.setRegion(requestDTO.getRegion());
             nuevaVenta.setComuna(requestDTO.getComuna());
 
@@ -44,8 +43,7 @@ public class VentaService {
             double neto = 0;
 
             for (DetalleVentaDTO detalleDTO : requestDTO.getDetalles()) {
-                boolean hayStock = inventarioClient.verificarStock(detalleDTO.getProductoId(),
-                        detalleDTO.getCantidad());
+                boolean hayStock = inventarioClient.verificarStock(detalleDTO.getProductoId(), detalleDTO.getCantidad());
                 if (!hayStock) {
                     throw new RuntimeException("Stock insuficiente para el producto ID: " + detalleDTO.getProductoId());
                 }
@@ -84,9 +82,26 @@ public class VentaService {
         }
     }
 
-    public List<VentaUbicacionDTO> generarCierreDiario() {
-        LocalDateTime inicioDia = LocalDate.now().atStartOfDay();
-        LocalDateTime finDia = LocalDateTime.of(LocalDate.now(), LocalTime.MAX);
-        return ventaRepository.obtenerResumenGeografico(inicioDia, finDia);
+    public CierreDiarioDTO generarCierreDiario(LocalDate fecha) {
+        LocalDateTime inicioDia = fecha.atStartOfDay();
+        LocalDateTime finDia = fecha.atTime(LocalTime.MAX);
+        
+        List<VentaUbicacionDTO> desglose = ventaRepository.obtenerResumenGeografico(inicioDia, finDia);
+        
+        Double totalRecaudado = 0.0;
+        Integer cantidadVentas = 0;
+        
+        for (VentaUbicacionDTO ubi : desglose) {
+            totalRecaudado += (ubi.getTotalRecaudado() != null ? ubi.getTotalRecaudado() : 0.0);
+            cantidadVentas += (ubi.getCantidadVentas() != null ? ubi.getCantidadVentas().intValue() : 0);
+        }
+
+        CierreDiarioDTO cierre = new CierreDiarioDTO();
+        cierre.setFecha(fecha);
+        cierre.setTotalRecaudado(totalRecaudado);
+        cierre.setCantidadVentas(cantidadVentas);
+        cierre.setVentasPorUbicacion(desglose);
+        
+        return cierre;
     }
 }

@@ -2,6 +2,7 @@ package com.grupocordillera.gc_ventas.services;
 
 import com.grupocordillera.gc_ventas.clients.InventarioClient;
 import com.grupocordillera.gc_ventas.config.RabbitMQConfig;
+import com.grupocordillera.gc_ventas.dtos.CierreDiarioDTO;
 import com.grupocordillera.gc_ventas.dtos.DetalleVentaDTO;
 import com.grupocordillera.gc_ventas.dtos.VentaRequestDTO;
 import com.grupocordillera.gc_ventas.dtos.VentaResponseDTO;
@@ -16,6 +17,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +28,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class VentaServiceTest {
+class VentasServiceTest {
 
     @Mock
     private VentaRepository ventaRepository;
@@ -38,7 +40,7 @@ class VentaServiceTest {
     private RabbitTemplate rabbitTemplate;
 
     @InjectMocks
-    private VentaService ventaService;
+    private VentasService ventasService;
 
     private VentaRequestDTO requestDTO;
     private DetalleVentaDTO detalleDTO;
@@ -77,7 +79,7 @@ class VentaServiceTest {
         when(ventaRepository.save(any(Venta.class))).thenReturn(ventaGuardadaMock);
 
         // 3. Ejecutamos el método
-        VentaResponseDTO respuesta = ventaService.procesarVenta(requestDTO);
+        VentaResponseDTO respuesta = ventasService.procesarVenta(requestDTO);
 
         // 4. Verificaciones
         assertNotNull(respuesta);
@@ -101,10 +103,9 @@ class VentaServiceTest {
         when(inventarioClient.verificarStock(1L, 2)).thenReturn(false);
 
         RuntimeException exception = assertThrows(RuntimeException.class, () -> {
-            ventaService.procesarVenta(requestDTO);
+            ventasService.procesarVenta(requestDTO);
         });
 
-        // Tu catch engloba la excepción con un mensaje personalizado, lo verificamos:
         assertTrue(exception.getMessage().contains("Stock insuficiente para el producto ID: 1"));
 
         // Verificamos que NO guardó en DB y NO mandó mensaje a RabbitMQ
@@ -113,17 +114,24 @@ class VentaServiceTest {
     }
 
     @Test
-    void cuandoGenerarCierreDiario_entoncesRetornaLista() {
-        // Preparamos un mock de la respuesta del repositorio
+    void cuandoGenerarCierreDiario_entoncesRetornaCierreEstructurado() {
+        // Usamos el constructor exacto de 5 parámetros de tu DTO
+        VentaUbicacionDTO ubicacionMock = new VentaUbicacionDTO("Metropolitana", "Santiago", 1L, 20000.0, 5L);
         List<VentaUbicacionDTO> listaCierre = new ArrayList<>();
-        listaCierre.add(new VentaUbicacionDTO(null, null, null, null, null)); // Ajusta según el constructor de tu DTO si es necesario
+        listaCierre.add(ubicacionMock);
 
         when(ventaRepository.obtenerResumenGeografico(any(LocalDateTime.class), any(LocalDateTime.class)))
                 .thenReturn(listaCierre);
 
-        List<VentaUbicacionDTO> resultado = ventaService.generarCierreDiario();
+        LocalDate fechaPrueba = LocalDate.now();
+        CierreDiarioDTO resultado = ventasService.generarCierreDiario(fechaPrueba);
 
-        assertFalse(resultado.isEmpty());
+        assertNotNull(resultado);
+        assertEquals(fechaPrueba, resultado.getFecha());
+        assertEquals(20000.0, resultado.getTotalRecaudado());
+        assertEquals(5, resultado.getCantidadVentas());
+        assertFalse(resultado.getVentasPorUbicacion().isEmpty());
+        
         verify(ventaRepository, times(1)).obtenerResumenGeografico(any(), any());
     }
 }

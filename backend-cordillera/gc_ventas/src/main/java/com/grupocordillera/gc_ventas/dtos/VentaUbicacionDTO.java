@@ -3,18 +3,24 @@ package com.grupocordillera.gc_ventas.dtos;
 public class VentaUbicacionDTO {
     private String region;
     private String comuna;
-    private Long productoId; // <-- NUEVO: Para saber qué se vendió
+    private Long productoId;
     private Double totalRecaudado;
     private Long cantidadVentas;
 
-    public VentaUbicacionDTO(String region, String comuna, Long productoId, Double totalRecaudado,
-            Long cantidadVentas) {
+    // Constructor vacío obligatorio para serialización (Jackson)
+    public VentaUbicacionDTO() {
+    }
+
+    // 🚀 EL CONSTRUCTOR EXACTO QUE REQUIERE TU @Query DE JPQL
+    public VentaUbicacionDTO(String region, String comuna, Long productoId, Double totalRecaudado, Long cantidadVentas) {
         this.region = region;
         this.comuna = comuna;
         this.productoId = productoId;
         this.totalRecaudado = totalRecaudado;
         this.cantidadVentas = cantidadVentas;
     }
+
+    // --- GETTERS Y SETTERS ---
 
     public String getRegion() {
         return region;

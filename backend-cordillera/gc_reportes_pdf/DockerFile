@@ -7,7 +7,6 @@ RUN mvn clean package -DskipTests
 FROM eclipse-temurin:21-jdk-alpine
 WORKDIR /app
 VOLUME /tmp
-# Fuentes requeridas para el renderizado de PDFs
 RUN apk add --no-cache fontconfig ttf-dejavu
 COPY --from=build /app/target/*.jar app.jar
 ENTRYPOINT ["java","-jar","/app/app.jar"]

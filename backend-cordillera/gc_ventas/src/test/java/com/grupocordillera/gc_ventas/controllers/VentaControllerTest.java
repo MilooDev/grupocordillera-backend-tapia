@@ -1,11 +1,11 @@
 package com.grupocordillera.gc_ventas.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.grupocordillera.gc_ventas.dtos.CierreDiarioDTO;
 import com.grupocordillera.gc_ventas.dtos.DetalleVentaDTO;
 import com.grupocordillera.gc_ventas.dtos.VentaRequestDTO;
 import com.grupocordillera.gc_ventas.dtos.VentaResponseDTO;
-import com.grupocordillera.gc_ventas.dtos.VentaUbicacionDTO;
-import com.grupocordillera.gc_ventas.services.VentaService;
+import com.grupocordillera.gc_ventas.services.VentasService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,6 +16,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +34,7 @@ class VentaControllerTest {
     private MockMvc mockMvc;
 
     @Mock
-    private VentaService ventaService;
+    private VentasService ventasService;
 
     @InjectMocks
     private VentaController ventaController;
@@ -60,7 +61,7 @@ class VentaControllerTest {
         requestDTO.setClienteRut("11111111-1");
         requestDTO.setRegion("Metropolitana");
         requestDTO.setComuna("Santiago");
-        requestDTO.setDetalles(detalles); // <--- ¡AQUÍ ESTÁ LA MAGIA QUE FALTABA!
+        requestDTO.setDetalles(detalles);
         
         responseDTO = new VentaResponseDTO(
                 "BOL-123", 23800.0, 3800.0, LocalDateTime.now(), "Venta registrada con éxito"
@@ -69,9 +70,9 @@ class VentaControllerTest {
 
     @Test
     void cuandoRegistrarVentaExitoso_entoncesRetorna201() throws Exception {
-        when(ventaService.procesarVenta(any(VentaRequestDTO.class))).thenReturn(responseDTO);
+        when(ventasService.procesarVenta(any(VentaRequestDTO.class))).thenReturn(responseDTO);
 
-        mockMvc.perform(post("/ventas/registrar")
+        mockMvc.perform(post("/api/ventas/registrar")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(requestDTO)))
                 .andExpect(status().isCreated());
@@ -79,10 +80,10 @@ class VentaControllerTest {
 
     @Test
     void cuandoRegistrarVentaFalla_entoncesRetorna400() throws Exception {
-        when(ventaService.procesarVenta(any(VentaRequestDTO.class)))
+        when(ventasService.procesarVenta(any(VentaRequestDTO.class)))
                 .thenThrow(new RuntimeException("Error al procesar la venta: Stock insuficiente"));
 
-        mockMvc.perform(post("/ventas/registrar")
+        mockMvc.perform(post("/api/ventas/registrar")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(requestDTO)))
                 .andExpect(status().isBadRequest())
@@ -91,10 +92,14 @@ class VentaControllerTest {
 
     @Test
     void cuandoObtenerCierreDiario_entoncesRetorna200() throws Exception {
-        List<VentaUbicacionDTO> listaCierre = new ArrayList<>();
-        when(ventaService.generarCierreDiario()).thenReturn(listaCierre);
+        CierreDiarioDTO mockCierre = new CierreDiarioDTO();
+        mockCierre.setFecha(LocalDate.now());
+        mockCierre.setTotalRecaudado(50000.0);
 
-        mockMvc.perform(get("/ventas/cierre-diario")
+        when(ventasService.generarCierreDiario(any(LocalDate.class))).thenReturn(mockCierre);
+
+        mockMvc.perform(get("/api/ventas/interno/cierre-diario")
+                .param("fecha", LocalDate.now().toString())
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
