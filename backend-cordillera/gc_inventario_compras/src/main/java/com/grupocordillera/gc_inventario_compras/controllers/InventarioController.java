@@ -17,13 +17,11 @@ public class InventarioController {
     @Autowired
     private InventarioService inventarioService;
 
-    // --- NUEVO ENDPOINT PARA LA CAJA (Descarga el catálogo inicial) ---
     @GetMapping("/productos")
     public ResponseEntity<Object> listarTodos() {
         return ResponseEntity.ok(inventarioService.listarTodosLosProductos());
     }
 
-    // --- PARA EL VENDEDOR (Buscador rápido) ---
     @GetMapping("/buscar")
     public ResponseEntity<List<Producto>> buscarRapido(@RequestParam String termino) {
         return ResponseEntity.ok(inventarioService.buscarRapido(termino));
@@ -35,16 +33,20 @@ public class InventarioController {
         return prod != null ? ResponseEntity.ok(prod) : ResponseEntity.notFound().build();
     }
 
-    // --- PARA GC_VENTAS (Validación interna) ---
-    @GetMapping("/verificar-stock")
-    public ResponseEntity<Boolean> verificarStock(@RequestParam Long productoId, @RequestParam Integer cantidad) {
+    @GetMapping("/verificar/{productoId}/{cantidad}")
+    public ResponseEntity<Boolean> verificarStock(@PathVariable Long productoId, @PathVariable Integer cantidad) {
         return ResponseEntity.ok(inventarioService.verificarStock(productoId, cantidad));
     }
 
-    // --- PARA ADMINS Y BODEGUEROS (Gestión de Catálogo) ---
+    // 🚀 NUEVO: Ruta expuesta para que Ventas envíe la orden de descuento
+    @PutMapping("/descontar/{productoId}/{cantidad}")
+    public ResponseEntity<Void> descontarStock(@PathVariable Long productoId, @PathVariable Integer cantidad) {
+        inventarioService.descontarStock(productoId, cantidad);
+        return ResponseEntity.ok().build();
+    }
+
     @PostMapping("/productos")
     public ResponseEntity<Producto> crearProducto(@RequestBody ProductoDTO dto) {
-        // Nota: La validación del token de ADMIN la hará el API Gateway en el futuro
         Producto creado = inventarioService.crearProducto(dto);
         return new ResponseEntity<>(creado, HttpStatus.CREATED);
     }

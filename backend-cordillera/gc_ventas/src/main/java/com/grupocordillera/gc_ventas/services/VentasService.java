@@ -13,6 +13,7 @@ import com.grupocordillera.gc_ventas.repositories.VentaRepository;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -21,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class VentasService { // <-- Corregido a plural según tu imagen
+public class VentasService {
 
     @Autowired
     private VentaRepository ventaRepository;
@@ -32,6 +33,7 @@ public class VentasService { // <-- Corregido a plural según tu imagen
     @Autowired
     private RabbitTemplate rabbitTemplate;
 
+    @Transactional
     public VentaResponseDTO procesarVenta(VentaRequestDTO requestDTO) {
         try {
             Venta nuevaVenta = new Venta();
@@ -47,6 +49,9 @@ public class VentasService { // <-- Corregido a plural según tu imagen
                 if (!hayStock) {
                     throw new RuntimeException("Stock insuficiente para el producto ID: " + detalleDTO.getProductoId());
                 }
+
+                // 🚀 AQUÍ OCURRE LA MAGIA: Le avisamos al Inventario que descuente el stock
+                inventarioClient.descontarStock(detalleDTO.getProductoId(), detalleDTO.getCantidad());
 
                 DetalleVenta detalle = new DetalleVenta();
                 detalle.setProductoId(detalleDTO.getProductoId());
@@ -73,7 +78,7 @@ public class VentasService { // <-- Corregido a plural según tu imagen
                     ventaGuardada.getNumeroBoleta(), ventaGuardada.getTotal(),
                     ventaGuardada.getIva(), ventaGuardada.getFecha(), "Venta registrada con éxito");
 
-            System.out.println("[GC_VENTAS] 📢 Venta " + ventaGuardada.getNumeroBoleta() + " guardada en DB.");
+            System.out.println("[GC_VENTAS] 📢 Venta " + ventaGuardada.getNumeroBoleta() + " guardada en DB y stock descontado.");
             rabbitTemplate.convertAndSend(RabbitMQConfig.EXCHANGE_NAME, RabbitMQConfig.ROUTING_KEY_VENTAS, responseDTO);
 
             return responseDTO;

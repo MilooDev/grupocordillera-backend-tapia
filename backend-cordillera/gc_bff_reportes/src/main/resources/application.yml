@@ -11,6 +11,9 @@ spring:
   # 👇 AQUÍ ESTÁ EL CAMBIO: main debe ir justo dentro de spring
   main:
     allow-bean-definition-overriding: true
+  jmx:
+    enabled: false
+
 
 eureka:
   client:

@@ -15,58 +15,63 @@ public class InventarioService {
     @Autowired
     private ProductoRepository productoRepository;
 
-    // ==========================================
-    // 1. FUNCIONES PÚBLICAS (Frontend y Vendedores)
-    // ==========================================
-    
-    // 🚀 MÉTODO CORREGIDO: Ahora sí devuelve la lista real de la base de datos
     public List<Producto> listarTodosLosProductos() {
         return productoRepository.findAll();
     }
 
     public List<Producto> buscarRapido(String termino) {
-        return productoRepository.findByNombreContainingIgnoreCase(termino);
+        return productoRepository.findByNombreContainingIgnoreCaseOrCodigoBarrasContaining(termino, termino);
     }
 
-    public Producto buscarPorCodigoBarras(String codigo) {
-        return productoRepository.findByCodigoBarras(codigo);
+    public Producto buscarPorCodigoBarras(String codigoBarras) {
+        return productoRepository.findByCodigoBarras(codigoBarras).orElse(null);
     }
 
-    // ==========================================
-    // 2. FUNCIÓN INTERNA (Para GC_VENTAS)
-    // ==========================================
-    public boolean verificarStock(Long productoId, Integer cantidadRequerida) {
-        Producto producto = productoRepository.findById(productoId).orElse(null);
-        if (producto == null)
-            return false;
-        return producto.getStock() >= cantidadRequerida;
+    public Boolean verificarStock(Long productoId, Integer cantidad) {
+        return productoRepository.findById(productoId)
+                .map(producto -> producto.getStock() >= cantidad)
+                .orElse(false);
     }
 
-    // ==========================================
-    // 3. FUNCIONES DE ADMIN/BODEGUERO (CRUD)
-    // ==========================================
+    // 🚀 NUEVO: Método que descuenta físicamente el stock de la base de datos
+    @Transactional
+    public void descontarStock(Long productoId, Integer cantidad) {
+        Producto producto = productoRepository.findById(productoId)
+                .orElseThrow(() -> new RuntimeException("Producto no encontrado en la base de datos"));
+        
+        if (producto.getStock() < cantidad) {
+            throw new RuntimeException("Stock insuficiente para el producto: " + producto.getNombre());
+        }
+        
+        producto.setStock(producto.getStock() - cantidad);
+        productoRepository.save(producto);
+        System.out.println("📉 [GC_INVENTARIO] Stock actualizado. Nuevo stock de " + producto.getNombre() + ": " + producto.getStock());
+    }
+
     @Transactional
     public Producto crearProducto(ProductoDTO dto) {
         Producto nuevo = new Producto();
-        mapearDtoAEntidad(dto, nuevo);
+        nuevo.setCodigoBarras(dto.getCodigoBarras());
+        nuevo.setNombre(dto.getNombre());
+        nuevo.setDescripcion(dto.getDescripcion());
+        nuevo.setMarca(dto.getMarca());
+        nuevo.setCategoria(dto.getCategoria());
+        nuevo.setPrecio(dto.getPrecio());
+        nuevo.setStock(dto.getStock());
         return productoRepository.save(nuevo);
     }
 
     @Transactional
     public Producto actualizarProducto(Long id, ProductoDTO dto) {
-        Producto existente = productoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
-        mapearDtoAEntidad(dto, existente);
-        return productoRepository.save(existente);
-    }
-
-    private void mapearDtoAEntidad(ProductoDTO dto, Producto entidad) {
-        entidad.setCodigoBarras(dto.getCodigoBarras());
-        entidad.setNombre(dto.getNombre());
-        entidad.setDescripcion(dto.getDescripcion());
-        entidad.setMarca(dto.getMarca());
-        entidad.setCategoria(dto.getCategoria());
-        entidad.setPrecio(dto.getPrecio());
-        entidad.setStock(dto.getStock());
+        return productoRepository.findById(id).map(producto -> {
+            producto.setCodigoBarras(dto.getCodigoBarras());
+            producto.setNombre(dto.getNombre());
+            producto.setDescripcion(dto.getDescripcion());
+            producto.setMarca(dto.getMarca());
+            producto.setCategoria(dto.getCategoria());
+            producto.setPrecio(dto.getPrecio());
+            producto.setStock(dto.getStock());
+            return productoRepository.save(producto);
+        }).orElseThrow(() -> new RuntimeException("Producto no encontrado para actualizar"));
     }
 }

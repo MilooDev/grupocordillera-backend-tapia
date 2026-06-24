@@ -86,6 +86,9 @@ spring:
             - Path=/api/reportes/**
           filters:
             - AuthenticationFilter
+  jmx:
+    enabled: false
+
 
 eureka:
   client:

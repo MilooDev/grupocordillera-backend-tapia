@@ -12,6 +12,9 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: false # Apagado por seguridad: No queremos que los logs expongan las consultas SQL en producción
+  jmx:
+    enabled: false
+
 
 eureka:
   client:

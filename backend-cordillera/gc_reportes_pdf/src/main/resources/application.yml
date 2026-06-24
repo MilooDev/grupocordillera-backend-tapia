@@ -13,6 +13,9 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: false
+  jmx:
+    enabled: false
+
 
 eureka:
   client:
