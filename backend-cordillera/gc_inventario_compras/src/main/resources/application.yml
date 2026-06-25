@@ -1,5 +1,5 @@
 server:
-  port: 8083
+  port: 8082
 
 spring:
   application:
@@ -15,16 +15,14 @@ spring:
   jmx:
     enabled: false
 
-
 eureka:
   instance:
-    appname: GC-INVENTARIO-COMPRAS # 👈 El antídoto: obligar a usar guiones medios
+    appname: GC-INVENTARIO-COMPRAS
     prefer-ip-address: true
   client:
     service-url:
       defaultZone: ${EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE:http://localhost:8761/eureka/}
 
-# 👇 LA RUTA PARA CONECTAR SWAGGER AL GATEWAY
 springdoc:
   api-docs:
     path: /api/inventario/v3/api-docs

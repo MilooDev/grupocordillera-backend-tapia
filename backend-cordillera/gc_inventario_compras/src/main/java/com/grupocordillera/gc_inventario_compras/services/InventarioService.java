@@ -29,11 +29,10 @@ public class InventarioService {
 
     public Boolean verificarStock(Long productoId, Integer cantidad) {
         return productoRepository.findById(productoId)
-                .map(producto -> producto.getStock() >= cantidad)
-                .orElse(false);
+            .map(producto -> producto.getStock() >= cantidad)
+            .orElse(false);
     }
 
-    // 🚀 NUEVO: Método que descuenta físicamente el stock de la base de datos
     @Transactional
     public void descontarStock(Long productoId, Integer cantidad) {
         Producto producto = productoRepository.findById(productoId)

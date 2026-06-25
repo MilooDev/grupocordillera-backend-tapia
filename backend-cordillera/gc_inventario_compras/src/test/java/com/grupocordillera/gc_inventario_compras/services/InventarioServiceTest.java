@@ -16,7 +16,6 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -47,17 +46,25 @@ class InventarioServiceTest {
 
     @Test
     void cuandoBuscarRapido_entoncesRetornaLista() {
-        when(productoRepository.findByNombreContainingIgnoreCase("tec")).thenReturn(Arrays.asList(productoMock));
+        // 🚀 FIX: Actualizado al método del repositorio que busca por nombre o código
+        when(productoRepository.findByNombreContainingIgnoreCaseOrCodigoBarrasContaining("tec", "tec"))
+                .thenReturn(Arrays.asList(productoMock));
+        
         List<Producto> resultado = inventarioService.buscarRapido("tec");
+        
         assertFalse(resultado.isEmpty());
-        verify(productoRepository).findByNombreContainingIgnoreCase("tec");
+        verify(productoRepository).findByNombreContainingIgnoreCaseOrCodigoBarrasContaining("tec", "tec");
     }
 
     @Test
     void cuandoBuscarPorCodigo_entoncesRetornaProducto() {
-        when(productoRepository.findByCodigoBarras("123456")).thenReturn(productoMock);
+        // 🚀 FIX: El repositorio ahora devuelve un Optional
+        when(productoRepository.findByCodigoBarras("123456")).thenReturn(Optional.of(productoMock));
+        
         Producto encontrado = inventarioService.buscarPorCodigoBarras("123456");
+        
         assertNotNull(encontrado);
+        verify(productoRepository).findByCodigoBarras("123456");
     }
 
     @Test
@@ -79,6 +86,25 @@ class InventarioServiceTest {
         when(productoRepository.findById(99L)).thenReturn(Optional.empty());
         boolean hayStock = inventarioService.verificarStock(99L, 1);
         assertFalse(hayStock);
+    }
+
+    // 🚀 NUEVO: Pruebas unitarias para la lógica de descuento de inventario
+    @Test
+    void cuandoDescontarStock_yEsSuficiente_entoncesRestaElStock() {
+        when(productoRepository.findById(1L)).thenReturn(Optional.of(productoMock));
+        
+        inventarioService.descontarStock(1L, 3);
+        
+        assertEquals(7, productoMock.getStock());
+        verify(productoRepository).save(productoMock);
+    }
+
+    @Test
+    void cuandoDescontarStock_yEsInsuficiente_entoncesLanzaExcepcion() {
+        when(productoRepository.findById(1L)).thenReturn(Optional.of(productoMock));
+        
+        assertThrows(RuntimeException.class, () -> inventarioService.descontarStock(1L, 15));
+        verify(productoRepository, never()).save(any(Producto.class));
     }
 
     @Test

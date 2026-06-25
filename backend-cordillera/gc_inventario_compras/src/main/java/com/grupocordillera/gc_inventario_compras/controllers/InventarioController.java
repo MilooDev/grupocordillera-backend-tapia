@@ -38,7 +38,6 @@ public class InventarioController {
         return ResponseEntity.ok(inventarioService.verificarStock(productoId, cantidad));
     }
 
-    // 🚀 NUEVO: Ruta expuesta para que Ventas envíe la orden de descuento
     @PutMapping("/descontar/{productoId}/{cantidad}")
     public ResponseEntity<Void> descontarStock(@PathVariable Long productoId, @PathVariable Integer cantidad) {
         inventarioService.descontarStock(productoId, cantidad);
