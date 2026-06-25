@@ -63,8 +63,7 @@ spring:
           uri: lb://GC-AUTH
           predicates:
             - Path=/api/admin/**
-          filters:
-            - AuthenticationFilter
+          # 🚀 AQUÍ ELIMINAMOS EL FILTRO: El controlador gc_auth validará su propia seguridad
 
         - id: ventas-service
           uri: lb://GC-VENTAS
@@ -88,7 +87,6 @@ spring:
             - AuthenticationFilter
   jmx:
     enabled: false
-
 
 eureka:
   client:

@@ -9,6 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -35,7 +36,16 @@ public class AuthService {
         return jwtUtil.generarToken(usuario.getEmail(), usuario.getRol().name());
     }
 
-    // 🚀 NUEVO: Retorna la lista a la tabla del frontend
+    // 🚀 LA CURA DEL ERROR: Envolvemos el token en un formato JSON amigable para Angular
+    public Object login(LoginRequestDTO dto) {
+        String tokenGenerado = login(dto.getEmail(), dto.getPassword());
+        return Map.of("token", tokenGenerado); 
+    }
+
+    // ------------------------------------------------------------------
+    // MANTENEDOR DE USUARIOS
+    // ------------------------------------------------------------------
+
     public List<Usuario> obtenerTodosLosUsuarios() {
         return usuarioRepository.findAll();
     }
@@ -60,9 +70,5 @@ public class AuthService {
         }
 
         return usuarioRepository.save(existente);
-    }
-
-    public Object login(LoginRequestDTO any) {
-        throw new UnsupportedOperationException("Unimplemented method 'login'");
     }
 }

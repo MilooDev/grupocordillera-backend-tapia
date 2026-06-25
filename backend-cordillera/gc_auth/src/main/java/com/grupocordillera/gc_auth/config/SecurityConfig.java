@@ -2,6 +2,7 @@ package com.grupocordillera.gc_auth.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -15,28 +16,29 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(); // Encriptación fuerte para las passwords
+        return new BCryptPasswordEncoder();
     }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            // 1. DESACTIVAMOS CORS LOCAL (El API Gateway ahora es el único encargado)
             .cors(cors -> cors.disable())
-            
-            // 2. DESACTIVAMOS CSRF (Crucial para APIs REST y uso de JWT)
             .csrf(csrf -> csrf.disable())
-            
-            // 3. CONFIGURAR RUTAS (Permitimos login, protegemos el resto)
             .authorizeHttpRequests(auth -> auth
+                // 1. Permitimos el "saludo" inicial de Angular (CORS Preflight)
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                
+                // 2. Rutas públicas de Login
                 .requestMatchers("/api/auth/**").permitAll()
-                // 🚀 LA PIEZA FALTANTE: Abrimos la puerta para que la petición llegue al controlador
-                // (La validación de seguridad de los gerentes/admins ya la hace el AdminUsuarioController)
-                .requestMatchers("/api/admin/usuarios/**").permitAll()
+                
+                // 3. 🚀 ABRIMOS TODA LA ZONA ADMIN (El controlador hará la validación manual)
+                .requestMatchers("/api/admin/**").permitAll()
+                
+                // 4. 🚀 PERMITIMOS VER LOS ERRORES REALES (Evita el falso 403 con error: null)
+                .requestMatchers("/error").permitAll()
+                
                 .anyRequest().authenticated()
             )
-            
-            // 4. POLÍTICA SIN ESTADO (No guardamos sesiones en memoria, usamos JWT)
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
             
         return http.build();
