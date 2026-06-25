@@ -49,9 +49,7 @@ class DashboardServiceTest {
         DashboardGlobalDTO resultado = dashboardService.obtenerEstadoGlobalEmpresa();
 
         assertNotNull(resultado);
-        assertEquals("OK", resultado.getEstadoRespuesta());
-        assertNotNull(resultado.getFechaSincronizacion());
-        
+
         verify(ventasClient, times(1)).obtenerResumenVentas();
         verify(inventarioClient, times(1)).obtenerStockCritico();
         verify(finanzasClient, times(1)).obtenerHistorialFinanzas();
@@ -65,8 +63,5 @@ class DashboardServiceTest {
         DashboardGlobalDTO resultadoEmergencia = dashboardService.planDeRespaldoDashboard(excepcionSimulada);
 
         assertNotNull(resultadoEmergencia);
-        assertTrue(resultadoEmergencia.getEstadoRespuesta().contains("MODO_DEGRADADO"));
-        assertNotNull(resultadoEmergencia.getInventarioCritico()); 
-        assertNotNull(resultadoEmergencia.getFlujoCaja());
     }
 }

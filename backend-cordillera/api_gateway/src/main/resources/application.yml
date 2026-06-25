@@ -4,11 +4,10 @@ server:
 spring:
   application:
     name: api-gateway
+  jmx:
+    enabled: false
   cloud:
     gateway:
-      # =========================================================
-      # CONFIGURACIÓN GLOBAL DE CORS PARA EL FRONTEND
-      # =========================================================
       globalcors:
         add-to-simple-url-handler-mapping: true
         cors-configurations:
@@ -29,7 +28,7 @@ spring:
             
       routes:
         # =========================================================
-        # RUTAS DE DOCUMENTACIÓN SWAGGER (Bypass de Filtros)
+        # RUTAS DE DOCUMENTACIÓN SWAGGER
         # =========================================================
         - id: swagger-ventas
           uri: lb://GC-VENTAS
@@ -63,7 +62,6 @@ spring:
           uri: lb://GC-AUTH
           predicates:
             - Path=/api/admin/**
-          # 🚀 AQUÍ ELIMINAMOS EL FILTRO: El controlador gc_auth validará su propia seguridad
 
         - id: ventas-service
           uri: lb://GC-VENTAS
@@ -85,17 +83,20 @@ spring:
             - Path=/api/reportes/**
           filters:
             - AuthenticationFilter
-  jmx:
-    enabled: false
+
+        # 🚀 RUTA PARA EL DASHBOARD CONECTADA
+        - id: bff-dashboard-service
+          uri: lb://GC-BFF-REPORTES
+          predicates:
+            - Path=/api/v1/dashboard/**
+          filters:
+            - AuthenticationFilter
 
 eureka:
   client:
     service-url:
       defaultZone: ${EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE:http://localhost:8761/eureka/}
 
-# =========================================================
-# MENÚ DESPLEGABLE DE SWAGGER CENTRALIZADO
-# =========================================================
 springdoc:
   swagger-ui:
     urls:

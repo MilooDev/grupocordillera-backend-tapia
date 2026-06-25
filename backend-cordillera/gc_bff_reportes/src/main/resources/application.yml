@@ -5,21 +5,25 @@ spring:
   application:
     name: GC-BFF-REPORTES
   data:
+    # 🚀 NUEVO: Conexión a la base de datos analítica de Python
+    mongodb:
+      uri: ${MONGO_URI:mongodb://localhost:27017/gc_analytics_db}
     redis:
       host: ${REDIS_HOST:localhost}
       port: 6379
-  # 👇 AQUÍ ESTÁ EL CAMBIO: main debe ir justo dentro de spring
   main:
     allow-bean-definition-overriding: true
   jmx:
     enabled: false
 
-
 eureka:
   client:
     service-url:
-      defaultZone: ${EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE:http://localhost:8761/eureka/}
+      # 🚀 FIX: Forzamos la red de Docker por defecto
+      defaultZone: ${EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE:http://eureka-server:8761/eureka/}
   instance:
+    # 🚀 FIX: Obliga a Eureka a registrarlo con este nombre, evitando el error "UNKNOWN"
+    appname: GC-BFF-REPORTES 
     prefer-ip-address: true
 
 resilience4j:

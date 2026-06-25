@@ -37,7 +37,6 @@ class BffControllerTest {
     @Test
     void cuandoPeticionesDentroDelLimite_entoncesRetorna200() throws Exception {
         DashboardGlobalDTO mockResponse = new DashboardGlobalDTO();
-        mockResponse.setEstadoRespuesta("OK");
         when(dashboardService.obtenerEstadoGlobalEmpresa()).thenReturn(mockResponse);
 
         // Hacemos una petición legítima que consume 1 token
@@ -49,7 +48,6 @@ class BffControllerTest {
     @Test
     void cuandoExcedeElLimiteDePeticiones_entoncesRetorna429() throws Exception {
         DashboardGlobalDTO mockResponse = new DashboardGlobalDTO();
-        mockResponse.setEstadoRespuesta("OK");
         when(dashboardService.obtenerEstadoGlobalEmpresa()).thenReturn(mockResponse);
 
         // Agotamos los 10 tokens del Bucket enviando 10 peticiones rápidas
